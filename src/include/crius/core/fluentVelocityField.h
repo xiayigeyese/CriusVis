@@ -1,8 +1,10 @@
 #pragma once
 
+#include <vtkDataSet.h>
 #include <vtkDoubleArray.h>
 #include <vtkFLUENTReader.h>
 #include <vtkSmartPointer.h>
+#include <vtkStaticCellLocator.h>
 
 #include <crius/core/velocityField.h>
 
@@ -23,11 +25,25 @@ public:
 
     AABB getBoundingBox() const noexcept override;
 
+    RC<VelocityField> cloneForParallelAccess() const override;
+
 private:
 
+    FluentVelocityField() { }
+
     vtkSmartPointer<vtkFLUENTReader> reader_;
+
+    Vec3 maxDirVel_;
+    Vec3 minDirVel_;
+
+    float maxVel_;
+    float minVel_;
 
     vtkDoubleArray *velX_;
     vtkDoubleArray *velY_;
     vtkDoubleArray *velZ_;
+
+    vtkSmartPointer<vtkStaticCellLocator> cellLocator_;
+
+    vtkDataSet *dataSet_;
 };

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <string>
 
 #include "../common.h"
 
@@ -37,4 +36,7 @@ public:
 
     /** @brief get a bounding box of non-zero region */
     virtual AABB getBoundingBox() const noexcept = 0;
+
+    /** @brief get a thread local copy */
+    virtual RC<VelocityField> cloneForParallelAccess() const = 0;
 };

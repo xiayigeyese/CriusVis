@@ -1,22 +1,16 @@
-#include <iostream>
-
 #include <QApplication>
+#include <QStyleFactory>
 
-#include <crius/core/constantVelocityField.h>
-#include <crius/core/fluentVelocityField.h>
-#include <crius/ui/velocityMap.h>
+#include <crius/ui/mainWindow.h>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    FluentVelocityField fvf("all-rke.cas");
+    qApp->setStyle(QStyleFactory::create("Fusion"));
 
-    auto velField = newRC<ConstantVelocityField>(Vec3(1, 2, 3));
-
-    VelocityMap map(nullptr, velField);
-    map.resize(640, 480);
-    map.show();
+    MainWindow main;
+    main.showMaximized();
 
     app.exec();
 }

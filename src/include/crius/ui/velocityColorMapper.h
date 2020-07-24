@@ -1,15 +1,17 @@
 #pragma once
 
 #include <crius/common.h>
-#include <crius/ui/colorSelector.h>
 
+/**
+ * @brief interface for map velocity to color
+ */
 class VelocityColorMapper : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    explicit VelocityColorMapper(QWidget *parent);
+    using QWidget::QWidget;
 
     virtual ~VelocityColorMapper() = default;
 
@@ -22,28 +24,4 @@ public:
 signals:
 
     void editParams();
-};
-
-class HSVColorMapper : public VelocityColorMapper
-{
-    Q_OBJECT
-
-public:
-
-    explicit HSVColorMapper(QWidget *parent);
-
-    void setVelocityRange(float minVel, float maxVel) override;
-
-    QColor getColor(const Vec3 &velocity) const noexcept override;
-
-    QColor getColor(float velocity) const noexcept override;
-
-private:
-
-    float lowestVel_   = 0;
-    float highestVel_  = 1;
-    float rcpVelRange_ = 1;
-
-    ColorSelector *highVelColor_;
-    ColorSelector *lowVelColor_;
 };

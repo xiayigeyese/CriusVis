@@ -2,6 +2,9 @@
 
 #include <QLabel>
 
+/**
+ * @brief QColor selector
+ */
 class ColorSelector : public QLabel
 {
     Q_OBJECT

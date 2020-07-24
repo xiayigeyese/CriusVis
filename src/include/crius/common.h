@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include <glm/glm.hpp>
+#include <agz/utility/math.h>
 
 // math
 
-using Vec2 = glm::vec2;
-using Vec3 = glm::vec3;
+using Vec2 = agz::math::vec2f;
+using Vec3 = agz::math::float3;
 
 struct AABB { Vec3 lower, upper; };
 
