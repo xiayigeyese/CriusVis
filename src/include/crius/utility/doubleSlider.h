@@ -27,6 +27,8 @@ signals:
 
     void changeValue();
 
+    void changingValue();
+
 private:
 
     void updateText();

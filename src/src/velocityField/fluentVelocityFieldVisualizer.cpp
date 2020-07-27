@@ -1,6 +1,6 @@
-#include <crius/core/fluentVelocityField.h>
-#include <crius/ui/closeEventDockWidget.h>
-#include <crius/ui/fluentVelocityFieldVisualizer.h>
+#include <crius/utility/closeEventDockWidget.h>
+#include <crius/velocityField/fluentVelocityField.h>
+#include <crius/velocityField/fluentVelocityFieldVisualizer.h>
 
 VelocityFieldVisualizer::VelocityFieldVisualizer(
     QWidget *parent,

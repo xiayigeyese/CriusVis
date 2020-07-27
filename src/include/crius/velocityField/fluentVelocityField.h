@@ -6,7 +6,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkStaticCellLocator.h>
 
-#include <crius/core/velocityField.h>
+#include <crius/velocityField/velocityField.h>
 
 /**
  * @brief velocity field loaded from cas file exported by Fluent

@@ -1,6 +1,6 @@
 #include <QColorDialog>
 
-#include <crius/ui/colorSelector.h>
+#include <crius/utility/colorSelector.h>
 
 ColorSelector::ColorSelector(const QColor &initColor, QWidget *parent)
     : QLabel(parent), isPressed_(false)

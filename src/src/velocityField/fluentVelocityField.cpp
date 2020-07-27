@@ -1,8 +1,10 @@
+#include <iostream>
+
 #include <vtkCellData.h>
 #include <vtkDataSet.h>
 #include <vtkMultiBlockDataSet.h>
 
-#include <crius/core/fluentVelocityField.h>
+#include <crius/velocityField/fluentVelocityField.h>
 
 FluentVelocityField::FluentVelocityField(const std::string &filename)
 {
@@ -19,6 +21,8 @@ FluentVelocityField::FluentVelocityField(const std::string &filename)
     cellLocator_->BuildLocator();
 
     const int numCells = static_cast<int>(dataSet_->GetNumberOfCells());
+
+    std::cout << "Cells in " << filename << ": " << numCells << std::endl;
 
     auto cellData = dataSet_->GetCellData();
 

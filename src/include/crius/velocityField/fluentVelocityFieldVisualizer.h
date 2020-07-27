@@ -3,7 +3,7 @@
 #include <QMenuBar>
 #include <QMainWindow>
 
-#include <crius/ui/velocityContour.h>
+#include <crius/velocityField/velocityContour.h>
 
 /**
  * @brief multi-view visualizer of a velocity field

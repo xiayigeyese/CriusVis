@@ -1,6 +1,6 @@
 #pragma once
 
-#include <crius/core/velocityField.h>
+#include <crius/velocityField/velocityField.h>
 
 /**
  * @brief constant velocity field (for debugging)

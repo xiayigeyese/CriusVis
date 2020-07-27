@@ -1,4 +1,4 @@
-#include <crius/ui/doubleSlider.h>
+#include <crius/utility/doubleSlider.h>
 
 DoubleSlider::DoubleSlider(QWidget *parent)
     : QWidget(parent)
@@ -21,12 +21,20 @@ DoubleSlider::DoubleSlider(QWidget *parent)
     setRange(0, 1);
     setValue(0.5);
 
-    connect(slider_, &QSlider::valueChanged,
-            [&](int)
+    connect(slider_, &QSlider::sliderReleased,
+            [&]
     {
         value_ = minVal_ + (maxVal_ - minVal_) * slider_->value() / MAX_INT;
         updateText();
         emit changeValue();
+    });
+
+    connect(slider_, &QSlider::valueChanged,
+        [&](int)
+    {
+        value_ = minVal_ + (maxVal_ - minVal_) * slider_->value() / MAX_INT;
+        updateText();
+        emit changingValue();
     });
 }
 

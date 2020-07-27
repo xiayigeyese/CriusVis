@@ -1,7 +1,95 @@
+#include <QPainter>
+
 #include <agz/utility/misc.h>
 #include <agz/utility/texture.h>
 
-#include <crius/ui/velocityContour.h>
+#include <crius/velocityField/velocityContour.h>
+
+ContourRenderLabel::ContourRenderLabel(
+    QWidget *parent, const VelocityContour *contour)
+    : QLabel(parent), contour_(contour)
+{
+
+}
+
+void ContourRenderLabel::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MiddleButton)
+    {
+        lastPressedX_ = event->x();
+        lastPressedY_ = event->y();
+        middlePressed_ = true;
+    }
+}
+
+void ContourRenderLabel::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::MiddleButton)
+        middlePressed_ = false;
+}
+
+void ContourRenderLabel::leaveEvent(QEvent *event)
+{
+    velocityText_ = QString("Velocity: nil");
+    middlePressed_ = false;
+}
+
+void ContourRenderLabel::mouseMoveEvent(QMouseEvent *event)
+{
+    updateTooltop(event->x(), event->y());
+
+    if(!middlePressed_)
+        return;
+
+    const int dX = event->x() - lastPressedX_;
+    const int dY = event->y() - lastPressedY_;
+    lastPressedX_ = event->x();
+    lastPressedY_ = event->y();
+
+    emit grabMove(dX, dY);
+}
+
+void ContourRenderLabel::wheelEvent(QWheelEvent *event)
+{
+    emit whellScroll(event->x(), event->y(), event->angleDelta().y());
+}
+
+void ContourRenderLabel::paintEvent(QPaintEvent *event)
+{
+    QLabel::paintEvent(event);
+
+    QPainter painter(this);
+    painter.setPen(Qt::white);
+
+    QFontMetrics fm(painter.font());
+    const int tightHeight = fm.tightBoundingRect(positionText_).height();
+    const int height = fm.height();
+
+    painter.drawText(0, tightHeight, positionText_);
+    painter.drawText(0, tightHeight + height, velocityText_);
+}
+
+void ContourRenderLabel::resizeEvent(QResizeEvent *event)
+{
+    emit resize();
+}
+
+void ContourRenderLabel::updateTooltop(int x, int y)
+{
+    const Vec3 pos = contour_->toWorldPosition(x, y);
+    const auto vel = contour_->getVelocity(pos);
+    
+    positionText_ = QString(" Position: (%1, %2, %3)")
+                        .arg(pos.x).arg(pos.y).arg(pos.z)
+                        .leftJustified(20);
+
+    velocityText_ = vel ?
+        QString(" Velocity: (%1, %2, %3)")
+            .arg(vel->x).arg(vel->y).arg(vel->z) :
+        QString(" Velocity: nil");
+
+    update();
+}
 
 VelocityContour::VelocityContour(
     QWidget                        *parent,
@@ -64,19 +152,20 @@ VelocityContour::VelocityContour(
 
     // color mapper & color bar
 
-    colorMapper_ = new HueColorMapper(downPanel);
+    colorMapper_ = new HSVColorMapper(downPanel);
     colorMapper_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     downLayout->addWidget(colorMapper_, 0, 2, 2, 1);
 
-    colorBar_ = new HUEColorBar(upPanel, colorMapper_);
+    colorBar_ = new ColorBar(upPanel, colorMapper_);
     colorBar_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Ignored);
     upLayout->addWidget(colorBar_);
 
     // render area
 
-    renderArea_ = new ResizeEventLabel(upPanel);
+    renderArea_ = new ContourRenderLabel(upPanel, this);
     renderArea_->setScaledContents(true);
     renderArea_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    renderArea_->setMouseTracking(true);
     upLayout->addWidget(renderArea_);
 
     initializeWorldRect();
@@ -88,6 +177,7 @@ VelocityContour::VelocityContour(
     connect(cameraDirection_, &QComboBox::currentTextChanged,
             [&](const QString&)
     {
+        isCacheDirty_ = true;
         initializeWorldRect();
         initializeDepth();
         render();
@@ -96,26 +186,110 @@ VelocityContour::VelocityContour(
     connect(velocityComponent_, &QComboBox::currentTextChanged,
             [&](const QString&)
     {
+        isCacheDirty_ = true;
         updateColorMapperVelRange();
         render();
     });
 
     connect(depthSlider_, &DoubleSlider::changeValue,
-            [&] { render(); });
+            [&]
+    {
+        isCacheDirty_ = true;
+        render();
+    });
 
     connect(colorMapper_, &VelocityColorMapper::editParams,
             [&]
     {
+        isCacheDirty_ = true;
         colorBar_->redraw();
         render();
     });
 
-    connect(renderArea_, &ResizeEventLabel::resize,
+    connect(renderArea_, &ContourRenderLabel::resize,
         [&]
     {
         resizeWorldRect();
         render();
     });
+
+    connect(renderArea_, &ContourRenderLabel::grabMove,
+            [&](int dX, int dY)
+    {
+        const int W = renderArea_->width();
+        const int H = renderArea_->height();
+
+        const Vec2 offset = (rightTopWorldPos_ - leftBottomWorldPos_)
+                          * Vec2(-dX, dY) / Vec2(W, H);
+        leftBottomWorldPos_ += offset;
+        rightTopWorldPos_   += offset;
+
+        render();
+    });
+
+    connect(renderArea_, &ContourRenderLabel::whellScroll,
+            [&](int x, int y, int dZ)
+    {
+        const int W = renderArea_->width();
+        const int H = renderArea_->height();
+
+        const Vec2 a = (rightTopWorldPos_ - leftBottomWorldPos_) / Vec2(W, H);
+        const Vec2 b = leftBottomWorldPos_;
+
+        const Vec2 cursorWorld = a * Vec2(x + 0.5f, H - 0.5f - y) + b;
+        Vec2 LBOffset = leftBottomWorldPos_ - cursorWorld;
+        Vec2 RTOffset = rightTopWorldPos_   - cursorWorld;
+
+        if(dZ > 0)
+        {
+            for(int i = 0; i < dZ; i += 120)
+            {
+                LBOffset *= 0.90909f;
+                RTOffset *= 0.90909f;
+            }
+        }
+        else
+        {
+            for(int i = 0; i > dZ; i -= 120)
+            {
+
+                LBOffset *= 1.1f;
+                RTOffset *= 1.1f;
+            }
+        }
+
+        leftBottomWorldPos_ = cursorWorld + LBOffset;
+        rightTopWorldPos_   = cursorWorld + RTOffset;
+
+        render();
+    });
+}
+
+Vec3 VelocityContour::toWorldPosition(int renderAreaX, int renderAreaY) const
+{
+    const int W = renderArea_->width();
+    const int H = renderArea_->height();
+    if(!W || !H)
+        return {};
+
+    const Vec2 a = (rightTopWorldPos_ - leftBottomWorldPos_) / Vec2(W, H);
+    const Vec2 b = leftBottomWorldPos_;
+    const Vec2 worldXY = a * Vec2(renderAreaX, H - 1 - renderAreaY) + b;
+
+    int horiAxis, vertAxis, depthAxis;
+    getRenderAxis(&horiAxis, &vertAxis, &depthAxis);
+
+    Vec3 worldPos;
+    worldPos[horiAxis] = worldXY.x;
+    worldPos[vertAxis] = worldXY.y;
+    worldPos[depthAxis] = depthSlider_->getValue();
+
+    return worldPos;
+}
+
+std::optional<Vec3> VelocityContour::getVelocity(const Vec3 &worldPos) const
+{
+    return threadLocalVelocityField_[0]->getVelocity(worldPos);
 }
 
 void VelocityContour::getRenderAxis(
@@ -144,11 +318,10 @@ void VelocityContour::getRenderAxis(
 void VelocityContour::initializeWorldRect()
 {
     const int W = renderArea_->width(), H = renderArea_->height();
-
-    const AABB aabb = threadLocalVelocityField_[0]->getBoundingBox();
-
     if(W <= 0 || H <= 0)
         return;
+
+    const AABB aabb = threadLocalVelocityField_[0]->getBoundingBox();
 
     const int xMarginPixels = W / 10;
     const int yMarginPixels = H / 10;
@@ -172,7 +345,25 @@ void VelocityContour::initializeWorldRect()
 
 void VelocityContour::resizeWorldRect()
 {
-    initializeWorldRect();
+    const int W = renderArea_->width();
+    const int H = renderArea_->height();
+    if(!W || !H)
+        return;
+
+    const Vec2 worldCenter = 0.5f * (leftBottomWorldPos_ + rightTopWorldPos_);
+    const Vec2 offset = worldCenter - leftBottomWorldPos_;
+    const Vec2 scale = {
+        static_cast<float>(W) / oldW_,
+        static_cast<float>(H) / oldH_
+    };
+    Vec2 newOffset = scale * offset;
+    newOffset.y = static_cast<float>(H) / W * newOffset.x;
+
+    leftBottomWorldPos_ = worldCenter - newOffset;
+    rightTopWorldPos_   = worldCenter + newOffset;
+
+    oldW_ = W;
+    oldH_ = H;
 }
 
 void VelocityContour::initializeDepth()
@@ -206,21 +397,6 @@ void VelocityContour::render()
     const auto component = VelocityField::VelocityComponent(
         velocityComponent_->currentIndex());
 
-    AGZ_DYN_FUNC_BOOL3_TEMPLATE(VelocityContour::renderImpl, renderFuncTable);
-
-    auto renderFunc = renderFuncTable[
-        agz::misc::bools_to_dyn_call_idx({
-            component == VelocityField::X,
-            component == VelocityField::Y,
-            component == VelocityField::Z
-            })];
-
-    (this->*renderFunc)();
-}
-
-template<bool X, bool Y, bool Z>
-void VelocityContour::renderImpl()
-{
     const int W = renderArea_->width();
     const int H = renderArea_->height();
 
@@ -239,12 +415,20 @@ void VelocityContour::renderImpl()
     int horiAxis, vertAxis, depthAxis;
     getRenderAxis(&horiAxis, &vertAxis, &depthAxis);
 
+    if(isCacheDirty_)
+    {
+        isCacheDirty_ = false;
+
+        contourCache_ = VelocityContourCache::build(
+            *colorMapper_, 4096, renderThreadCount_,
+            threadLocalVelocityField_, *renderThreadGroup_,
+            { horiAxis, vertAxis, depthAxis }, depth, component);
+    }
+
     std::atomic<int> globalY = 0;
     renderThreadGroup_->run(
         renderThreadCount_, [&](int threadIndex)
     {
-        auto &velocityField = threadLocalVelocityField_[threadIndex];
-
         for(;;)
         {
             const int y = globalY++;
@@ -254,29 +438,7 @@ void VelocityContour::renderImpl()
             for(int x = 0; x < W; ++x)
             {
                 const Vec2 worldHV = pixelToWorld(x + 0.5f, y + 0.5f);
-
-                Vec3 worldPos;
-                worldPos[horiAxis] = worldHV.x;
-                worldPos[vertAxis] = worldHV.y;
-                worldPos[depthAxis] = depth;
-
-                const auto vel = velocityField->getVelocity(worldPos);
-                if(!vel)
-                {
-                    imageData(H - 1 - y, x) = { 255, 255, 255 };
-                    continue;
-                }
-
-                QColor color;
-                if constexpr(X)
-                    color = colorMapper_->getColor(vel->x);
-                else if constexpr(Y)
-                    color = colorMapper_->getColor(vel->y);
-                else
-                    color = colorMapper_->getColor(vel->z);
-
-                imageData(H - 1 - y, x) = to_color3b(agz::math::color3f(
-                    color.redF(), color.greenF(), color.blueF()));
+                imageData(H - 1 - y, x) = contourCache_.getValue(worldHV);
             }
         }
     });

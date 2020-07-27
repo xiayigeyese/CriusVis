@@ -3,9 +3,9 @@
 
 #include <agz/utility/texture.h>
 
-#include <crius/ui/hsvColorMapper.h>
+#include <crius/common/hsvColorMapper.h>
 
-HUEColorBar::HUEColorBar(QWidget *parent, VelocityColorMapper *colorMapper)
+ColorBar::ColorBar(QWidget *parent, VelocityColorMapper *colorMapper)
     : QLabel(parent), colorMapper_(colorMapper)
 {
     lowVel_ = 0;
@@ -17,7 +17,7 @@ HUEColorBar::HUEColorBar(QWidget *parent, VelocityColorMapper *colorMapper)
     redraw();
 }
 
-void HUEColorBar::setParams(
+void ColorBar::setParams(
     float lowVel,
     float highVel)
 {
@@ -26,7 +26,7 @@ void HUEColorBar::setParams(
     redraw();
 }
 
-void HUEColorBar::redraw()
+void ColorBar::redraw()
 {
     const int w = width();
     const int h = height();
@@ -59,7 +59,7 @@ void HUEColorBar::redraw()
     setPixmap(pixmap);
 }
 
-void HUEColorBar::paintEvent(QPaintEvent *event)
+void ColorBar::paintEvent(QPaintEvent *event)
 {
     QLabel::paintEvent(event);
 
@@ -98,10 +98,10 @@ void HUEColorBar::paintEvent(QPaintEvent *event)
     }
 }
 
-HueColorMapper::HueColorMapper(QWidget *parent)
+HSVColorMapper::HSVColorMapper(QWidget *parent)
     : VelocityColorMapper(parent)
 {
-    HueColorMapper::setVelocityRange(0, 1);
+    HSVColorMapper::setVelocityRange(0, 1);
 
     highVelColor_ = new ColorSelector(Qt::red, this);
     lowVelColor_  = new ColorSelector(Qt::blue, this);
@@ -123,19 +123,19 @@ HueColorMapper::HueColorMapper(QWidget *parent)
     setContentsMargins(-1, 0, -1, 0);
 }
 
-void HueColorMapper::setVelocityRange(float minVel, float maxVel)
+void HSVColorMapper::setVelocityRange(float minVel, float maxVel)
 {
     lowestVel_  = minVel;
     highestVel_ = (std::max)(maxVel, lowestVel_ + 0.001f);
     rcpVelRange_ = 1 / (maxVel - minVel);
 }
 
-QColor HueColorMapper::getColor(const Vec3 &velocity) const noexcept
+QColor HSVColorMapper::getColor(const Vec3 &velocity) const noexcept
 {
     return getColor(velocity.length());
 }
 
-QColor HueColorMapper::getColor(float velocity) const noexcept
+QColor HSVColorMapper::getColor(float velocity) const noexcept
 {
     const float t = agz::math::saturate(
         (velocity - lowestVel_) * rcpVelRange_);
