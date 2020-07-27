@@ -1,7 +1,12 @@
 #include <QApplication>
 #include <QStyleFactory>
+#include <QGuiApplication>
 
 #include <crius/ui/mainWindow.h>
+#include <crius/luo/openglWidget.h>
+#include <crius/luo/velocityField3D.h>
+
+
 
 int main(int argc, char *argv[])
 {
@@ -13,4 +18,6 @@ int main(int argc, char *argv[])
     main.showMaximized();
 
     app.exec();
+
+	return app.exec();
 }
