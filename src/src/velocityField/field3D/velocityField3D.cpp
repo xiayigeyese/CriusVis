@@ -59,38 +59,38 @@ VelocityField3D::VelocityField3D(QWidget* parent, RC<const VelocityField> veloci
     velocityCountInput->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
     // bbox set bound x y z
-    xminSlider_ = new DoubleSlider(downPanel);
-    xmaxSlider_ = new DoubleSlider(downPanel);
-    yminSlider_ = new DoubleSlider(downPanel);
-    ymaxSlider_ = new DoubleSlider(downPanel);
-    zminSlider_ = new DoubleSlider(downPanel);
-    zmaxSlider_ = new DoubleSlider(downPanel);
-    auto xminSliderText_ = new QLabel("xmin", downPanel);
-    auto xmaxSliderText_ = new QLabel("xmax", downPanel);
-    auto yminSliderText_ = new QLabel("ymin", downPanel);
-    auto ymaxSliderText_ = new QLabel("ymax", downPanel);
-    auto zminSliderText_ = new QLabel("zmin", downPanel);
-    auto zmaxSliderText_ = new QLabel("zmax", downPanel);
-    xminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    xmaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    yminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    ymaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    zminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    zmaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //xminSlider_ = new DoubleSlider(downPanel);
+    //xmaxSlider_ = new DoubleSlider(downPanel);
+    //yminSlider_ = new DoubleSlider(downPanel);
+    //ymaxSlider_ = new DoubleSlider(downPanel);
+    //zminSlider_ = new DoubleSlider(downPanel);
+    //zmaxSlider_ = new DoubleSlider(downPanel);
+    //auto xminSliderText_ = new QLabel("xmin", downPanel);
+    //auto xmaxSliderText_ = new QLabel("xmax", downPanel);
+    //auto yminSliderText_ = new QLabel("ymin", downPanel);
+    //auto ymaxSliderText_ = new QLabel("ymax", downPanel);
+    //auto zminSliderText_ = new QLabel("zmin", downPanel);
+    //auto zmaxSliderText_ = new QLabel("zmax", downPanel);
+    //xminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //xmaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //yminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //ymaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //zminSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //zmaxSliderText_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    AABB velocityBBox = velocityField_->getBoundingBox();
-    xminSlider_->setRange(velocityBBox.lower.x, velocityBBox.upper.x);
-    xminSlider_->setValue(velocityBBox.lower.x);
-    xmaxSlider_->setRange(velocityBBox.lower.x, velocityBBox.upper.x);
-    xmaxSlider_->setValue(velocityBBox.upper.x);
-    yminSlider_->setRange(velocityBBox.lower.y, velocityBBox.upper.y);
-    yminSlider_->setValue(velocityBBox.lower.y);
-    ymaxSlider_->setRange(velocityBBox.lower.y, velocityBBox.upper.y);
-    ymaxSlider_->setValue(velocityBBox.upper.y);
-    zminSlider_->setRange(velocityBBox.lower.z, velocityBBox.upper.z);
-    zminSlider_->setValue(velocityBBox.lower.z);
-    zmaxSlider_->setRange(velocityBBox.lower.z, velocityBBox.upper.z);
-    zmaxSlider_->setValue(velocityBBox.upper.z);
+    //AABB velocityBBox = velocityField_->getBoundingBox();
+    //xminSlider_->setRange(velocityBBox.lower.x, velocityBBox.upper.x);
+    //xminSlider_->setValue(velocityBBox.lower.x);
+    //xmaxSlider_->setRange(velocityBBox.lower.x, velocityBBox.upper.x);
+    //xmaxSlider_->setValue(velocityBBox.upper.x);
+    //yminSlider_->setRange(velocityBBox.lower.y, velocityBBox.upper.y);
+    //yminSlider_->setValue(velocityBBox.lower.y);
+    //ymaxSlider_->setRange(velocityBBox.lower.y, velocityBBox.upper.y);
+    //ymaxSlider_->setValue(velocityBBox.upper.y);
+    //zminSlider_->setRange(velocityBBox.lower.z, velocityBBox.upper.z);
+    //zminSlider_->setValue(velocityBBox.lower.z);
+    //zmaxSlider_->setRange(velocityBBox.lower.z, velocityBBox.upper.z);
+    //zmaxSlider_->setValue(velocityBBox.upper.z);
 
     upLayout->addWidget(colorBar_);
     upLayout->addWidget(openglWidget_);
@@ -104,20 +104,20 @@ VelocityField3D::VelocityField3D(QWidget* parent, RC<const VelocityField> veloci
     downLayout->addWidget(velocityCountText, 3, 0, 1, 1);
     downLayout->addWidget(velocityCountInput, 3, 1, 1, 1);
 
-    downLayout->addWidget(xminSliderText_, 0, 2, 1, 1);
-    downLayout->addWidget(xminSlider_, 0, 3, 1, 1);
-    downLayout->addWidget(xmaxSlider_, 0, 4, 1, 1);
-    downLayout->addWidget(xmaxSliderText_, 0, 5, 1, 1);
-
-    downLayout->addWidget(yminSliderText_, 1, 2, 1, 1);
-    downLayout->addWidget(yminSlider_, 1, 3, 1, 1);
-    downLayout->addWidget(ymaxSlider_, 1, 4, 1, 1);
-    downLayout->addWidget(ymaxSliderText_, 1, 5, 1, 1);
-
-    downLayout->addWidget(zminSliderText_, 2, 2, 1, 1);
-    downLayout->addWidget(zminSlider_, 2, 3, 1, 1);
-    downLayout->addWidget(zmaxSlider_, 2, 4, 1, 1);
-    downLayout->addWidget(zmaxSliderText_, 2, 5, 1, 1);
+    //downLayout->addWidget(xminSliderText_, 0, 2, 1, 1);
+    //downLayout->addWidget(xminSlider_, 0, 3, 1, 1);
+    //downLayout->addWidget(xmaxSlider_, 0, 4, 1, 1);
+    //downLayout->addWidget(xmaxSliderText_, 0, 5, 1, 1);
+    //
+    //downLayout->addWidget(yminSliderText_, 1, 2, 1, 1);
+    //downLayout->addWidget(yminSlider_, 1, 3, 1, 1);
+    //downLayout->addWidget(ymaxSlider_, 1, 4, 1, 1);
+    //downLayout->addWidget(ymaxSliderText_, 1, 5, 1, 1);
+    //
+    //downLayout->addWidget(zminSliderText_, 2, 2, 1, 1);
+    //downLayout->addWidget(zminSlider_, 2, 3, 1, 1);
+    //downLayout->addWidget(zmaxSlider_, 2, 4, 1, 1);
+    //downLayout->addWidget(zmaxSliderText_, 2, 5, 1, 1);
 
     connect(colorMapper_, &VelocityColorMapper::editParams,
         [&]
@@ -130,6 +130,7 @@ VelocityField3D::VelocityField3D(QWidget* parent, RC<const VelocityField> veloci
         {
             arrowAxis_ = arrowSize_->currentIndex();
             float value = openglWidget_->getArrowScale(arrowAxis_);
+            arrowSizeSlider_->setValue(value);
         });
 
     connect(arrowSizeSlider_, &DoubleSlider::changeValue,
@@ -167,37 +168,37 @@ VelocityField3D::VelocityField3D(QWidget* parent, RC<const VelocityField> veloci
             openglWidget_->renderForReSample();
         });
 
-    connect(xminSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-           
-        });
-
-    connect(xmaxSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-
-        });
-
-    connect(yminSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-
-        });
-    connect(ymaxSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-
-        });
-
-    connect(zminSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-
-        });
-    connect(zmaxSlider_, &DoubleSlider::changeValue,
-        [&]
-        {
-
-        });
+    //connect(xminSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //       
+    //    });
+    //
+    //connect(xmaxSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //
+    //    });
+    //
+    //connect(yminSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //
+    //    });
+    //connect(ymaxSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //
+    //    });
+    //
+    //connect(zminSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //
+    //    });
+    //connect(zmaxSlider_, &DoubleSlider::changeValue,
+    //    [&]
+    //    {
+    //
+    //    });
 }

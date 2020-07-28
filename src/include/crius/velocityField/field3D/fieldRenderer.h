@@ -14,8 +14,10 @@ class QOpenGLShaderProgram;
 
 class FieldRenderer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
-	Q_OBJECT;
+	Q_OBJECT
+
 public:
+
 	enum SampleType
 	{
 		RANDOMSAMPLE = 0,
@@ -27,12 +29,15 @@ public:
 	{
 		Vec3 color_;
 		Mat4 modelMatrix_;
+
 		InstanceData() {}
 		InstanceData(Vec3 color, Mat4 modelMatrix) 
 			: color_(color), modelMatrix_(modelMatrix)
 		{
+
 		}
 	};
+
 	FieldRenderer(QWidget* parent, const VelocityField* velocityField, HSVColorMapper* colorMapper);
 	~FieldRenderer();
 
@@ -52,6 +57,7 @@ public:
 	void renderForReScaleArrow();
 
 protected:
+
 	void initializeGL() override;
 	void paintGL() override;
  
@@ -61,6 +67,7 @@ protected:
 	void wheelEvent(QWheelEvent* event) override;
 
 private:
+
 	void init();
 	bool createShader();
 	void loadArrowMesh();
@@ -83,7 +90,6 @@ private:
 	void updataInstanceVBO();
 	void bindInstanceVBOForPaint();
 
-private:
 	// shader members
 	QOpenGLShaderProgram* shaderProgram_;
 	unsigned int vao_, vbo_, instanceVBO_;

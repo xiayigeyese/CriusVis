@@ -24,16 +24,17 @@ VelocityFieldVisualizer::VelocityFieldVisualizer(
 void VelocityFieldVisualizer::addContourWindow()
 {
     CloseEventDockWidget *dock = new CloseEventDockWidget(this);
-    dock->setWindowTitle(QString());
+    dock->setWindowTitle(QString("Contour"));
 
     VelocityContour *contour = new VelocityContour(
         dock, velocityField_, threadGroup_);
     dock->setWidget(contour);
 
-    dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::LeftDockWidgetArea, dock);
 
-    dock->resize(640, 480);
+    contour->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     connect(dock, &CloseEventDockWidget::closeSignal, [=]
     {
@@ -44,18 +45,19 @@ void VelocityFieldVisualizer::addContourWindow()
 void VelocityFieldVisualizer::add3DWindow()
 {
     CloseEventDockWidget* dock = new CloseEventDockWidget(this);
-    dock->setWindowTitle(QString());
+    dock->setWindowTitle(QString("Field"));
 
     auto field3D = new VelocityField3D(dock, velocityField_);
     dock->setWidget(field3D);
 
-    dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+    dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea, dock);
 
-    dock->resize(640, 480);
+    field3D->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    dock->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     connect(dock, &CloseEventDockWidget::closeSignal, [=]
-        {
-            delete dock;
-        });
+    {
+        delete dock;
+    });
 }

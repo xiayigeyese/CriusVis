@@ -30,7 +30,7 @@ void ContourRenderLabel::mouseReleaseEvent(QMouseEvent *event)
 
 void ContourRenderLabel::leaveEvent(QEvent *event)
 {
-    velocityText_ = QString("Velocity: nil");
+    velocityText_ = QString(" Velocity: nil");
     middlePressed_ = false;
 }
 
@@ -269,7 +269,7 @@ Vec3 VelocityContour::toWorldPosition(int renderAreaX, int renderAreaY) const
 {
     const int W = renderArea_->width();
     const int H = renderArea_->height();
-    if(!W || !H)
+    if(W <= 0 || H <= 0)
         return {};
 
     const Vec2 a = (rightTopWorldPos_ - leftBottomWorldPos_) / Vec2(W, H);
@@ -347,7 +347,7 @@ void VelocityContour::resizeWorldRect()
 {
     const int W = renderArea_->width();
     const int H = renderArea_->height();
-    if(!W || !H)
+    if(W <= 0 || H <= 0)
         return;
 
     const Vec2 worldCenter = 0.5f * (leftBottomWorldPos_ + rightTopWorldPos_);
@@ -399,6 +399,8 @@ void VelocityContour::render()
 
     const int W = renderArea_->width();
     const int H = renderArea_->height();
+    if(W <= 0 || H <= 0)
+        return;
 
     const Vec2 a = (rightTopWorldPos_ - leftBottomWorldPos_) / Vec2(W, H);
     const Vec2 b = leftBottomWorldPos_;

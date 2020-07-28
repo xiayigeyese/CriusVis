@@ -6,7 +6,6 @@
 #include <QMouseEvent>
 #include <QPoint>
 #include <QMatrix4x4>
-#include <QVector4D>
 #include <QVector>
 #include <QVBoxLayout>
 
@@ -44,11 +43,11 @@ void FieldRenderer::initializeGL()
 {
 	initializeOpenGLFunctions();
 
-	// 创建shader
+	// create shader
 	if (!createShader()) 
 		return;
 	
-	// 绑定数据
+	// vao
 	glGenVertexArrays(1, &vao_);
 	glGenBuffers(1, &vbo_);
 	glBindVertexArray(vao_);
@@ -140,46 +139,39 @@ void FieldRenderer::setVelcotityField(VelocityField* velocityField)
 	init();
 }
 
-void FieldRenderer::init() {
-	// 初始化参数
+void FieldRenderer::init()
+{
 	sampleNum_ = 1000;
 	leftBtnPressed_ = false;
 	rightBtnPressed_ = false;
 	middleBtnPressed_ = false;
 
-	// 加载箭头模型
 	loadArrowMesh();
 	
-	// 速度场 获取最大速度和最小速度
 	float maxVelocity = velocityField_->getMaxVelocity(FluentVelocityField::All);
 	float minVelocity = velocityField_->getMinVelocity(FluentVelocityField::All);
 
-	// 创建velocity到color的 colorMapper对象
-	// colorMapper_ = new HSVColorMapper(this);
 	colorMapper_->setVelocityRange(minVelocity, maxVelocity);
 
-	// 获取速度场包围盒 和 速度场中心
 	velocityFieldBBox_ = velocityField_->getBoundingBox();
 	velocityFiledCenter_[0] = (velocityFieldBBox_.lower.x + velocityFieldBBox_.upper.x) / 2;
 	velocityFiledCenter_[1] = (velocityFieldBBox_.lower.y + velocityFieldBBox_.upper.y) / 2;
 	velocityFiledCenter_[2] = (velocityFieldBBox_.lower.z + velocityFieldBBox_.upper.z) / 2;
 
-	// 根据包围盒 设置箭头大小
 	scale_ = Vec3(1) * getArrowSize(velocityFieldBBox_, arrowBBox_, sampleNum_);
 	scaleResize_ = Vec3(1);
 
-	// 根据包围盒和采样数量采样
 	sampleType_ = HALTONSAMPLE;
 	samplePoints(velocityFieldBBox_, sampleNum_);
 
-	// 获取instanceData
 	constructInstanceData(colorMapper_, scale_ * scaleResize_);
 
-	// 设置摄像机参数
-	yaw_ = -90;
+	// camera params
+
+    yaw_ = -90;
 	pitch_ = 0;
 	fov_ = 45.0f;
-	cameraDistance_ = agz::math::distance(velocityFieldBBox_.lower, velocityFieldBBox_.upper) * 0.8;
+	cameraDistance_ = 0.8f * distance(velocityFieldBBox_.lower, velocityFieldBBox_.upper);
 	lookAt_ = velocityFiledCenter_;
 }
 
@@ -322,7 +314,6 @@ void FieldRenderer::uniformSamplePoints(const AABB& bbox, long sampleNum)
 	int numY = ceil(theta * (bbox.upper.y - bbox.lower.y));
 	int numZ = ceil(theta * (bbox.upper.z - bbox.lower.z));
 	const float boxSidelen = (extent / Vec3(numX, numY, numZ)).max_elem();
-	float delta = 1.0 / theta;
 	for (int i = 0; i < numX; i++)
 	{
 		for (int j = 0; j < numY; j++)
@@ -332,9 +323,9 @@ void FieldRenderer::uniformSamplePoints(const AABB& bbox, long sampleNum)
 				for (int s = 0; s < 10; s++)
 				{
 					Vec3 point;
-					point.x = bbox.lower.x + (i + dist(gen)) * boxSidelen; //i * delta + delta * dist(gen);
-					point.y = bbox.lower.y + (j + dist(gen)) * boxSidelen; //j * delta + delta * dist(gen);
-					point.z = bbox.lower.z + (k + dist(gen)) * boxSidelen; //k * delta + delta * dist(gen);
+					point.x = bbox.lower.x + (i + dist(gen)) * boxSidelen;
+					point.y = bbox.lower.y + (j + dist(gen)) * boxSidelen;
+					point.z = bbox.lower.z + (k + dist(gen)) * boxSidelen;
 					auto optVelocity = velocityField_->getVelocity(point);
 					if (!optVelocity)
 						continue;
