@@ -10,7 +10,8 @@
 using Vec2 = agz::math::vec2f;
 using Vec3 = agz::math::float3;
 using Vec4 = agz::math::float4;
-using Mat4 = agz::math::mat4f_c;
+using Mat4 = agz::math::float4x4;
+using Vec3i = agz::math::vec3i;
 
 struct AABB { Vec3 lower, upper; };
 
